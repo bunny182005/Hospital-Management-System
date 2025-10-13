@@ -78,8 +78,8 @@ cd hospital-management-system
 
 Backend Setup:
 
-cd server
-npm install
+'''cd server
+npm install'''
 # Create a .env file and add your database configuration (see .env.example)
 npm run dev
 

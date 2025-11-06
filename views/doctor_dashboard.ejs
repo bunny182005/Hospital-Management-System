@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* Design Tokens */
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border: #475569;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-dark);
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .header-right a {
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background 0.3s ease;
+        }
+        
+        .header-right a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem 2rem;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1.5rem 0;
+            color: var(--text-primary);
+        }
+        
+        /* Stat Cards Grid */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.1);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+        }
+        
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value.earnings { color: var(--success); }
+        .stat-value.appointments { color: var(--primary); }
+        .stat-value.patients { color: var(--warning); }
+        .stat-value.rating { color: #f59e0b; }
+        
+        .stat-detail {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            min-height: 350px;
+        }
+        
+        .chart-box h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 280px;
+        }
+        
+        /* Tables */
+        .table-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead tr {
+            background: var(--bg-tertiary);
+            border-bottom: 2px solid var(--border);
+        }
+        
+        th {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+        
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge.pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .badge.confirmed { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge.rejected { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.5rem 0.75rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-accept {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+        
+        .btn-accept:hover {
+            background: rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-reject {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+        
+        .btn-reject:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-meds {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--primary);
+        }
+        
+        .btn-meds:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-chat {
+            background: rgba(6, 182, 212, 0.2);
+            color: #06b6d4;
+        }
+        
+        .btn-chat:hover {
+            background: rgba(6, 182, 212, 0.3);
+        }
+        
+        .btn-call {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+        
+        .btn-call:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 1rem; text-align: center; }
+            .header h1 { font-size: 1.5rem; }
+            .stat-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+            .stat-value { font-size: 1.75rem; }
+            .charts-grid { grid-template-columns: 1fr; }
+            th, td { padding: 0.75rem; font-size: 0.875rem; }
+            .btn { padding: 0.4rem 0.6rem; font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Dr. <%= (typeof username !== 'undefined' ? username : 'User') %>'s Dashboard</h1>
+        <div class="header-right">
+            <span style="color: white;">Welcome, Dr. <%= (typeof username !== 'undefined' ? username : 'User') %></span>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Your Performance</h2>
+        <div class="stat-grid">
+            <% if (typeof doctorAnalytics !== 'undefined') { %>
+                <div class="stat-card">
+                    <h3>Total Earnings</h3>
+                    <div class="stat-value earnings">$<%= doctorAnalytics.totalEarnings ? doctorAnalytics.totalEarnings.toFixed(2) : '0.00' %></div>
+                    <div class="stat-detail">From all consultations</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Appointments</h3>
+                    <div class="stat-value appointments"><%= doctorAnalytics.totalAppointments || 0 %></div>
+                    <div class="stat-detail">Completed & pending</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Patients</h3>
+                    <div class="stat-value patients"><%= doctorAnalytics.activePatients || 0 %></div>
+                    <div class="stat-detail">This month</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Rating</h3>
+                    <div class="stat-value rating"><%= doctorAnalytics.avgRating ? doctorAnalytics.avgRating.toFixed(1) : '0.0' %>/5.0</div>
+                    <div class="stat-detail">From patient reviews</div>
+                </div>
+            <% } else { %>
+                <div class="stat-card" style="grid-column: 1 / -1;">
+                    <h3 style="color: var(--warning);">Analytics Missing</h3>
+                    <div class="stat-value">N/A</div>
+                    <div class="stat-detail">Performance data is currently unavailable. Please check your controller.</div>
+                </div>
+            <% } %>
+        </div>
+
+        <h2>Analytics</h2>
+        <div class="charts-grid">
+            <div class="chart-box">
+                <h3>Appointments This Month</h3>
+                <div class="chart-wrapper">
+                    <canvas id="appointmentsChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-box">
+                <h3>Earnings Trend</h3>
+                <div class="chart-wrapper">
+                    <canvas id="earningsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Pending & Upcoming Appointments</h3>
+                <span style="color: var(--text-secondary); font-size: 0.875rem;"><%= (typeof appointments !== 'undefined' ? appointments.length : 0) %> appointments</span>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Date & Time</th>
+                            <th>Fee</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (typeof appointments !== 'undefined' && appointments.length > 0) { %>
+                            <% appointments.forEach(function(appt) { %>
+                                <tr>
+                                    <td><strong><%= appt.patient_name %></strong></td>
+                                    <td><%= new Date(appt.appointment_date).toLocaleString() %></td>
+                                    <td><strong>$<%= appt.consultation_fee %></strong></td>
+                                    <td><span class="badge <%= appt.status.toLowerCase() %>"><%= appt.status %></span></td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <% if (appt.status === 'Pending') { %>
+                                                <form action="/doctor/appointments/accept/<%= appt.id %>" method="POST" style="display:inline;">
+                                                    <button type="submit" class="btn btn-accept">Accept</button>
+                                                </form>
+                                                <form action="/doctor/appointments/reject/<%= appt.id %>" method="POST" style="display:inline;">
+                                                    <button type="submit" class="btn btn-reject">Reject</button>
+                                                </form>
+                                            <% } else if (appt.status === 'Confirmed') { %>
+                                                <a href="/doctor/medications/<%= appt.id %>" class="btn btn-meds">Meds</a>
+                                                <a href="/appointment/chat/<%= appt.id %>" target="_blank" class="btn btn-chat">Chat</a>
+                                                <a href="/video/room/<%= appt.id %>" target="_blank" class="btn btn-call">Call</a>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-secondary);">No appointments found</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chartColors = {
+            primary: '#3b82f6',
+            success: '#10b981',
+            warning: '#f59e0b',
+            gridColor: '#475569',
+            textColor: '#cbd5e1'
+        };
+
+        // --- 
+        // FIX: Use the robust 'typeof' check.
+        // This prevents the EJS 'Unexpected token )' SyntaxError
+        // ---
+       const chartData = <%- (typeof chartData !== 'undefined' && JSON.stringify(chartData)) || '{}' %>;
+
+        // Use dynamic data with fallbacks to empty arrays
+        const appointmentLabels = chartData.appointmentLabels || ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+        const appointmentsData = chartData.appointmentValues || [0, 0, 0, 0];
+        const earningsLabels = chartData.earningsLabels || ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+        const earningsData = chartData.earningsValues || [0, 0, 0, 0];
+        // --- END FIX ---
+
+        // ---
+        // FIX: Add safety checks for canvas elements.
+        // This prevents client-side JS errors if the elements aren't rendered.
+        // ---
+        const ctxApptEl = document.getElementById('appointmentsChart');
+        if (ctxApptEl) {
+            const ctxAppt = ctxApptEl.getContext('2d');
+            new Chart(ctxAppt, {
+                type: 'line',
+                data: {
+                    labels: appointmentLabels, // Use dynamic labels
+                    datasets: [{
+                        label: 'Appointments',
+                        data: appointmentsData, // Use dynamic data
+                        borderColor: chartColors.primary,
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointBackgroundColor: chartColors.primary,
+                        pointBorderColor: '#1e293b',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: chartColors.gridColor },
+                            ticks: { color: chartColors.textColor }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: chartColors.textColor }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: chartColors.textColor } }
+                    }
+                }
+            });
+        }
+
+        const ctxEarningsEl = document.getElementById('earningsChart');
+        if (ctxEarningsEl) {
+            const ctxEarnings = ctxEarningsEl.getContext('2d');
+            new Chart(ctxEarnings, {
+                type: 'bar',
+                data: {
+                    labels: earningsLabels, // Use dynamic labels
+                    datasets: [{
+                        label: 'Earnings ($)',
+                        data: earningsData, // Use dynamic data
+                        backgroundColor: chartColors.success,
+                        borderColor: 'rgba(16, 185, 129, 0.5)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        hoverBackgroundColor: 'rgba(16, 185, 129, 0.8)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: chartColors.gridColor },
+                            ticks: { color: chartColors.textColor }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: chartColors.textColor }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: chartColors.textColor } }
+                    }
+                }
+            });
+        }
+    </script>
+     <%- include('partials/chatbot') %>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare - Modern Healthcare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            color: #1a202c;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        nav {
+            background: white;
+            padding: 16px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #667eea;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn-primary {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 80px 20px;
+            text-align: center;
+        }
+        
+        .hero-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 52px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            color: #4a5568;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Features */
+        .features {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+        }
+        
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #1a202c;
+        }
+        
+        .feature-card p {
+            color: #718096;
+            line-height: 1.6;
+        }
+        
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        
+        .cta h2 {
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+        
+        .cta p {
+            font-size: 18px;
+            margin-bottom: 24px;
+            opacity: 0.95;
+        }
+        
+        .btn-cta {
+            padding: 14px 32px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Footer */
+        footer {
+            background: #1a202c;
+            color: #cbd5e0;
+            padding: 48px 20px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+        
+        .footer-section h4 {
+            color: white;
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section a {
+            color: #cbd5e0;
+            text-decoration: none;
+            font-size: 14px;
+            line-height: 1.8;
+            transition: color 0.3s;
+        }
+        
+        .footer-section a:hover {
+            color: #667eea;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid rgba(203, 213, 224, 0.1);
+            padding-top: 24px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links { gap: 16px; }
+            .hero h1 { font-size: 36px; }
+            .hero p { font-size: 16px; }
+            .hero-buttons { flex-direction: column; align-items: center; }
+            .cta h2 { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modern navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">MediCare</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Services</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="/complain">Support</a></li>
+                <li class="auth-buttons">
+                    <a href="/login" class="btn-secondary">Login</a>
+                    <a href="/signup" class="btn-primary">Sign Up</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Modern hero section -->
+    <section class="hero">
+        <div class="hero-container">
+            <h1>Your Health, Our Priority</h1>
+            <p>Connect with top-rated doctors and manage your healthcare seamlessly in one place</p>
+            <div class="hero-buttons">
+                <a href="/signup" class="btn-primary">Get Started</a>
+                <a href="/login" class="btn-secondary">Sign In</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modern features grid -->
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">👨‍⚕️</div>
+            <h3>Expert Doctors</h3>
+            <p>Access a network of verified and highly-qualified healthcare professionals</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📅</div>
+            <h3>Easy Booking</h3>
+            <p>Schedule appointments with just a few clicks at your preferred time</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💻</div>
+            <h3>Video Calls</h3>
+            <p>Secure video consultations from the comfort of your home</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💊</div>
+            <h3>Digital Prescriptions</h3>
+            <p>Receive and manage your medications digitally with ease</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Secure & Private</h3>
+            <p>Your health data is encrypted and protected with top-grade security</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>Always Available</h3>
+            <p>Access your health records anytime, anywhere from any device</p>
+        </div>
+    </section>
+
+    <!-- Modern CTA section -->
+    <section class="cta">
+        <h2>Ready to Take Control of Your Health?</h2>
+        <p>Join thousands of patients who trust MediCare for their healthcare needs</p>
+        <button class="btn-cta" onclick="window.location.href='/signup'">Start Your Journey</button>
+    </section>
+
+    <!-- Modern footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#careers">Careers</a></li>
+                    <li><a href="#press">Press</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#security">Security</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#blog">Blog</a></li>
+                    <li><a href="#help">Help Center</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#privacy">Privacy Policy</a></li>
+                    <li><a href="#terms">Terms of Service</a></li>
+                    <li><a href="#cookies">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 MediCare. All rights reserved. | Providing quality healthcare solutions worldwide</p>
+        </div>
+    </footer>
+     <%- include('partials/chatbot') %>
+</body>
+</html>

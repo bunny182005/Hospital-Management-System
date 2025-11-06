@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* Design Tokens */
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border: #475569;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-dark);
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .header-right a {
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background 0.3s ease;
+        }
+        
+        .header-right a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem 2rem; /* Added bottom padding */
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1.5rem 0;
+            color: var(--text-primary);
+        }
+        
+        /* Stat Cards Grid */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.1);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+        }
+        
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value.revenue { color: var(--success); }
+        .stat-value.patients { color: var(--primary); }
+        .stat-value.doctors { color: var(--warning); }
+        .stat-value.pending { color: var(--warning); }
+        .stat-value.confirmed { color: var(--success); }
+        .stat-value.rejected { color: var(--danger); }
+        .stat-value.success { color: var(--success); } /* Added for uptime */
+        
+        .stat-detail {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            min-height: 350px;
+        }
+        
+        .chart-box h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 280px;
+        }
+        
+        /* Tables */
+        .table-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead tr {
+            background: var(--bg-tertiary);
+            border-bottom: 2px solid var(--border);
+        }
+        
+        th {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+        
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge.confirmed { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge.pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .badge.rejected { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .badge.not_verified { background: rgba(245, 158, 11, 0.2); color: var(--warning); } /* Added */
+        .badge.verified { background: rgba(16, 185, 129, 0.2); color: var(--success); } /* Added */
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 1rem; text-align: center; }
+            .header h1 { font-size: 1.5rem; }
+            .stat-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+            .stat-value { font-size: 1.75rem; }
+            .charts-grid { grid-template-columns: 1fr; }
+            th, td { padding: 0.75rem; font-size: 0.875rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Admin Dashboard</h1>
+        <div class="header-right">
+            <span>Welcome, <strong><%= (typeof username !== 'undefined' ? username : 'Admin') %></strong>!</span>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <% const safeAnalytics = (typeof analytics !== 'undefined' ? analytics : {}) %>
+
+    <div class="container">
+        <h2>System Analytics</h2>
+        <div class="stat-grid">
+            <div class="stat-card">
+                <h3>Total Revenue</h3>
+                <div class="stat-value revenue">$<%= safeAnalytics.revenue ? safeAnalytics.revenue.toFixed(2) : '0.00' %></div>
+                <div class="stat-detail">Lifetime earnings</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Patients</h3>
+                <div class="stat-value patients"><%= safeAnalytics.patients || 0 %></div>
+                <div class="stat-detail">Active patients</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Doctors</h3>
+                <div class="stat-value doctors"><%= safeAnalytics.doctors || 0 %></div>
+                <div class="stat-detail">Registered doctors</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pending Appointments</h3>
+                <div class="stat-value pending"><%= safeAnalytics.pending || 0 %></div>
+                <div class="stat-detail">Awaiting confirmation</div>
+            </div>
+            <div class="stat-card">
+                <h3>Confirmed Appointments</h3>
+                <div class="stat-value confirmed"><%= safeAnalytics.confirmed || 0 %></div>
+                <div class="stat-detail">Scheduled</div>
+            </div>
+            <div class="stat-card">
+                <h3>Rejected Appointments</h3>
+                <div class="stat-value rejected"><%= safeAnalytics.rejected || 0 %></div>
+                <div class="stat-detail">Declined</div>
+            </div>
+        </div>
+
+        <h2>Time-Based Analytics</h2>
+        <div class="stat-grid">
+            <div class="stat-card">
+                <h3>Revenue (Last Month)</h3>
+                <div class="stat-value revenue">$<%= safeAnalytics.revenueLastMonth ? safeAnalytics.revenueLastMonth.toFixed(2) : '0.00' %></div>
+                <div class="stat-detail"><%= safeAnalytics.revenueGrowth || '0' %>% growth vs previous</div>
+            </div>
+            <div class="stat-card">
+                <h3>Appointments (Last 30 Days)</h3>
+                <div class="stat-value confirmed"><%= safeAnalytics.appointmentsLastMonth || 0 %></div>
+                <div class="stat-detail">Total scheduled</div>
+            </div>
+            <div class="stat-card">
+                <h3>New Patients (This Month)</h3>
+                <div class="stat-value patients"><%= safeAnalytics.newPatientsThisMonth || 0 %></div>
+                <div class="stat-detail">Newly registered</div>
+            </div>
+            <div class="stat-card">
+                <h3>Server Uptime</h3>
+                <div class="stat-value success">99.9%</div>
+                <div class="stat-detail">Past 30 days</div>
+            </div>
+        </div>
+        
+        <h2>Visual Analytics</h2>
+        <div class="charts-grid">
+            <div class="chart-box">
+                <h3>Appointment Status</h3>
+                <div class="chart-wrapper">
+                    <canvas id="appointmentStatusChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-box">
+                <h3>Revenue per Doctor</h3>
+                <div class="chart-wrapper">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-box">
+                <h3>Monthly Revenue Trend</h3>
+                <div class="chart-wrapper">
+                    <canvas id="monthlyRevenueChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-box">
+                <h3>Monthly Appointments Trend</h3>
+                <div class="chart-wrapper">
+                    <canvas id="appointmentsTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <h2>Department Performance</h2>
+        <div class="stat-grid">
+            <% if (safeAnalytics.departments && safeAnalytics.departments.length > 0) { %>
+                <% safeAnalytics.departments.forEach(dep => { %>
+                    <div class="stat-card">
+                        <h3><%= dep.name || 'N/A' %></h3>
+                        <div class="stat-value revenue">$<%= dep.revenue ? dep.revenue.toFixed(2) : '0.00' %></div>
+                        <div class="stat-detail"><%= dep.appointments || 0 %> appointments</div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="stat-card">
+                    <h3 style="color: var(--text-secondary);">No department data available</h3>
+                </div>
+            <% } %>
+        </div>
+
+        <% const safeDoctors = (typeof doctors !== 'undefined' ? doctors : []) %>
+        <% const safePatients = (typeof patients !== 'undefined' ? patients : []) %>
+
+        <h2>Top Performing Doctors</h2>
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Doctor Rankings</h3>
+                <span style="color: var(--text-secondary); font-size: 0.875rem;">Ranked by revenue & patient count</span>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Doctor Name</th>
+                            <th>Specialization</th>
+                            <th>Patients Seen</th>
+                            <th>Revenue ($)</th>
+                            <th>Avg Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (safeDoctors.length > 0) { %>
+                            <% const rankedDoctors = [...safeDoctors].sort((a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0)) %>
+                            <% rankedDoctors.slice(0, 10).forEach((doc, i) => { %>
+                                <tr>
+                                    <td><strong>#<%= i + 1 %></strong></td>
+                                    <td><%= doc.username || 'N/A' %></td>
+                                    <td><%= doc.specialization || 'N/A' %></td>
+                                    <td><%= doc.patientsSeen || 0 %></td>
+                                    <td><strong>$<%= doc.totalRevenue ? doc.totalRevenue.toFixed(2) : '0.00' %></strong></td>
+                                    <td><span style="color: var(--warning);">★ <%= doc.rating || 'N/A' %>/5.0</span></td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="6" style="text-align: center;">No doctor data available.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Manage Doctors</h3>
+                <span style="color: var(--text-secondary); font-size: 0.875rem;"><%= safeDoctors.length %> doctors</span>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Specialization</th>
+                            <th>Consultation Fee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (safeDoctors.length > 0) { %>
+                            <% safeDoctors.forEach(function(doc) { %>
+                                <tr>
+                                    <td><strong>#<%= doc.id %></strong></td>
+                                    <td><%= doc.username %></td>
+                                    <td><%= doc.email %></td>
+                                    <td><%= doc.specialization %></td>
+                                    <td><strong>$<%= doc.consultation_fee %></strong></td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" style="text-align: center;">No doctors found.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Manage Patients</h3>
+                <span style="color: var(--text-secondary); font-size: 0.875rem;"><%= safePatients.length %> patients</span>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Email Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (safePatients.length > 0) { %>
+                            <% safePatients.forEach(function(patient) { %>
+                                <tr>
+                                    <td><strong>#<%= patient.id %></strong></td>
+                                    <td><%= patient.username %></td>
+                                    <td><%= patient.email %></td>
+                                    <% const statusClass = (patient.email_status || 'not_verified').toLowerCase().replace('_', '-') %>
+                                    <td><span class="badge <%= statusClass %>"><%= patient.email_status %></span></td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="4" style="text-align: center;">No patients found.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart.js color scheme for dark mode
+        const chartColors = {
+            pending: '#f59e0b',
+            confirmed: '#10b981',
+            rejected: '#ef4444',
+            primary: '#3b82f6', // Added from new snippet
+            gridColor: '#475569',
+            textColor: '#cbd5e1'
+        };
+
+        // Safety check for chartData
+        const safeChartData = <%- (typeof chartData !== 'undefined' && JSON.stringify(chartData)) || '{}' %>;
+
+        // Data from EJS variables
+        const statusData = safeChartData.appointmentStatus || { pending: 0, confirmed: 0, rejected: 0 };
+        const revenueData = safeChartData.doctorRevenue || [];
+        const monthlyRevenueData = safeChartData.monthlyRevenue || Array(12).fill(0); // NEW
+        const appointmentsTrendData = safeChartData.appointmentsTrend || []; // NEW
+
+        // Chart 1: Appointment Status Doughnut
+        if (document.getElementById('appointmentStatusChart')) {
+            const ctxStatus = document.getElementById('appointmentStatusChart').getContext('2d');
+            new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pending', 'Confirmed', 'Rejected'],
+                    datasets: [{
+                        data: [statusData.pending, statusData.confirmed, statusData.rejected],
+                        backgroundColor: [
+                            chartColors.pending,
+                            chartColors.confirmed,
+                            chartColors.rejected
+                        ],
+                        borderColor: '#1e293b',
+                        borderWidth: 2,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: chartColors.textColor, padding: 20, font: { size: 12 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 2: Revenue per Doctor Bar
+        if (document.getElementById('revenueChart')) {
+            const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctxRevenue, {
+                type: 'bar',
+                data: {
+                    labels: revenueData.map(d => "Dr. " + d.username),
+                    datasets: [{
+                        label: 'Total Revenue ($)',
+                        data: revenueData.map(d => d.revenue),
+                        backgroundColor: chartColors.primary, // Using color from variable
+                        borderColor: '#1e40af',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        hoverBackgroundColor: '#60a5fa'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: chartColors.gridColor },
+                            ticks: { color: chartColors.textColor }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: chartColors.textColor }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: chartColors.textColor } }
+                    }
+                }
+            });
+        }
+
+        // NEW Chart 3: Monthly Revenue Trend Line Chart
+        if (document.getElementById('monthlyRevenueChart')) {
+            const ctxMonthly = document.getElementById('monthlyRevenueChart').getContext('2d');
+            new Chart(ctxMonthly, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Monthly Revenue ($)',
+                        data: monthlyRevenueData,
+                        borderColor: chartColors.confirmed, // Using color variable
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointBackgroundColor: chartColors.confirmed, // Using color variable
+                        pointBorderColor: '#1e293b',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: chartColors.gridColor },
+                            ticks: { color: chartColors.textColor }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: chartColors.textColor }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: chartColors.textColor } }
+                    }
+                }
+            });
+        }
+
+        // NEW Chart 4: Appointment Trends Chart
+        if (document.getElementById('appointmentsTrendChart')) {
+            const ctxAppointmentsTrend = document.getElementById('appointmentsTrendChart').getContext('2d');
+            new Chart(ctxAppointmentsTrend, {
+                type: 'line',
+                data: {
+                    // Assuming data is for past 8 weeks
+                    labels: appointmentsTrendData.map((_, i) => `Week ${i + 1}`),
+                    datasets: [{
+                        label: 'Appointments',
+                        data: appointmentsTrendData,
+                        borderColor: chartColors.primary,
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointBackgroundColor: chartColors.primary,
+                        pointBorderColor: '#1e293b',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: chartColors.gridColor },
+                            ticks: { color: chartColors.textColor }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: chartColors.textColor }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: chartColors.textColor } }
+                    }
+                }
+            });
+        }
+    </script>
+     <%- include('partials/chatbot') %>
+</body>
+</html>

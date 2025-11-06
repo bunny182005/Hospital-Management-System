@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Login</title>
+	<script src="https://cdn.jsdelivr.net/npm/promise-polyfill/dist/polyfill.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 20px;
+		}
+
+		.login-container {
+			background: white;
+			border-radius: 12px;
+			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+			overflow: hidden;
+			width: 100%;
+			max-width: 420px;
+			animation: slideUp 0.5s ease-out;
+		}
+
+		@keyframes slideUp {
+			from {
+				opacity: 0;
+				transform: translateY(20px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.login-header {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			padding: 40px 30px;
+			text-align: center;
+			color: white;
+		}
+
+		.login-header h1 {
+			font-size: 32px;
+			font-weight: 700;
+			margin-bottom: 8px;
+			letter-spacing: -0.5px;
+		}
+
+		.login-header p {
+			font-size: 14px;
+			opacity: 0.9;
+			font-weight: 500;
+		}
+
+		.login-form {
+			padding: 40px 30px;
+		}
+
+		.form-group {
+			margin-bottom: 20px;
+		}
+
+		.form-group label {
+			display: block;
+			font-size: 14px;
+			font-weight: 600;
+			color: #1a1a1a;
+			margin-bottom: 8px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+
+		.form-group input[type="text"],
+		.form-group input[type="password"] {
+			width: 100%;
+			padding: 12px 16px;
+			border: 2px solid #e0e0e0;
+			border-radius: 8px;
+			font-size: 15px;
+			transition: all 0.3s ease;
+			font-family: inherit;
+		}
+
+		.form-group input[type="text"]:focus,
+		.form-group input[type="password"]:focus {
+			outline: none;
+			border-color: #667eea;
+			box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+		}
+
+		.form-group input::placeholder {
+			color: #999;
+			font-weight: 500;
+		}
+
+		.submit-btn {
+			width: 100%;
+			padding: 14px 20px;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			border: none;
+			border-radius: 8px;
+			color: white;
+			font-size: 16px;
+			font-weight: 700;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			margin-top: 10px;
+		}
+
+		.submit-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+		}
+
+		.submit-btn:active {
+			transform: translateY(0);
+		}
+
+		.login-footer {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+			padding-top: 20px;
+			border-top: 1px solid #f0f0f0;
+			margin-top: 25px;
+		}
+
+		.login-footer a {
+			font-size: 14px;
+			color: #667eea;
+			text-decoration: none;
+			font-weight: 600;
+			transition: all 0.3s ease;
+			display: inline-block;
+		}
+
+		.login-footer a:hover {
+			color: #764ba2;
+			text-decoration: underline;
+		}
+
+		.divider {
+			text-align: center;
+			font-size: 13px;
+			color: #999;
+			margin: 15px 0;
+			font-weight: 500;
+		}
+
+		@media (max-width: 480px) {
+			.login-header {
+				padding: 30px 20px;
+			}
+
+			.login-header h1 {
+				font-size: 28px;
+			}
+
+			.login-form {
+				padding: 30px 20px;
+			}
+
+			.login-container {
+				border-radius: 8px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="login-container">
+		<div class="login-header">
+			<h1>Welcome</h1>
+			<p>Sign in to your account</p>
+		</div>
+
+		<form class="login-form" method="POST" action="/login" onsubmit="handleLogin(event)">
+			<div class="form-group">
+				<label for="username">Username</label>
+				<input 
+					type="text" 
+					id="username" 
+					name="username" 
+					placeholder="Enter your username" 
+					required
+				>
+			</div>
+
+			<div class="form-group">
+				<label for="password">Password</label>
+				<input 
+					type="password" 
+					id="password" 
+					name="password" 
+					placeholder="Enter your password" 
+					required
+				>
+			</div>
+
+			<button type="submit" class="submit-btn">Sign In</button>
+
+			<div class="login-footer">
+				<div class="divider">
+					New here?
+				</div>
+				<a href="/signup">Create an account</a>
+				<a href="/resetpassword">Forgot your password?</a>
+			</div>
+		</form>
+	</div>
+
+	<script>
+		function handleLogin(event) {
+			event.preventDefault();
+			
+			const username = document.getElementById('username').value;
+			const password = document.getElementById('password').value;
+			
+			if (username && password) {
+				Swal.fire({
+					title: 'Success!',
+					text: 'You have been logged in successfully',
+					icon: 'success',
+					confirmButtonColor: '#667eea',
+					confirmButtonText: 'Continue'
+				}).then(() => {
+					document.querySelector('.login-form').submit();
+				});
+			} else {
+				Swal.fire({
+					title: 'Error!',
+					text: 'Please enter username and password',
+					icon: 'error',
+					confirmButtonColor: '#667eea'
+				});
+			}
+		}
+	</script>
+	 <%- include('partials/chatbot') %>
+</body>
+</html>

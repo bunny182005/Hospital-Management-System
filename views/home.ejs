@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+        h1 {
+            color: #1a202c;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .logout-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .logout-btn:hover { transform: translateY(-2px); }
+        
+        section { margin-bottom: 32px; }
+        h2 {
+            color: #1a202c;
+            font-size: 22px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        select, input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .submit-btn {
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .table-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #f7fafc;
+            padding: 16px;
+            text-align: left;
+            font-weight: 700;
+            color: #2d3748;
+            font-size: 14px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+        tr:hover { background: #f7fafc; }
+        
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status.pending { background: #fef3c7; color: #92400e; }
+        .status.confirmed { background: #d1fae5; color: #065f46; }
+        .status.rejected { background: #fee2e2; color: #7f1d1d; }
+        
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .actions a {
+            padding: 8px 14px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .actions a:hover { background: #764ba2; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #718096;
+        }
+        
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 16px; }
+            h1 { font-size: 22px; }
+            .table-wrapper { padding: 16px; }
+            th, td { padding: 12px; font-size: 13px; }
+            .actions { flex-direction: column; gap: 8px; }
+            .actions a { text-align: center; }
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="container">
+        <!-- Modern header with gradient button -->
+        <header>
+            <h1>Welcome back, <%= username %>!</h1>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </header>
+
+        <!-- Modern appointment booking form -->
+        <section>
+            <h2>Book Your Next Appointment</h2>
+            <div class="form-card">
+                <form action="/appointment/book" method="POST">
+                    <div class="form-group">
+                        <label for="doctor_id">Select Your Doctor</label>
+                        <select id="doctor_id" name="doctor_id" required>
+                            <option value="">-- Choose a doctor --</option>
+                            <% doctors.forEach(function(doc) { %>
+                                <option value="<%= doc.id %>">
+                                    Dr. <%= doc.username %> • <%= doc.specialization %> • $<%= doc.consultation_fee %>
+                                </option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointment_date">Preferred Date & Time</label>
+                        <input type="datetime-local" id="appointment_date" name="appointment_date" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Book Appointment</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Modern appointments table -->
+        <section>
+            <h2>Your Appointments</h2>
+            <div class="table-wrapper">
+                <% if (appointments.length === 0) { %>
+                    <div class="empty-state">
+                        <p>No appointments yet. Book one to get started!</p>
+                    </div>
+                <% } else { %>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Doctor</th>
+                                <th>Date & Time</th>
+                                <th>Status</th>
+                                <th>Fee</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% appointments.forEach(function(appt) { %>
+                                <tr>
+                                    <td><strong>Dr. <%= appt.doctor_name %></strong></td>
+                                    <td><%= new Date(appt.appointment_date).toLocaleString() %></td>
+                                    <td>
+                                        <span class="status <%= appt.status.toLowerCase() %>">
+                                            <%= appt.status %>
+                                        </span>
+                                    </td>
+                                    <td>$<%= appt.consultation_fee %></td>
+                                    <td>
+                                        <% if (appt.status === 'Confirmed') { %>
+                                            <div class="actions">
+                                                <a href="/appointment/medications/<%= appt.id %>">Medications</a>
+                                                <a href="/appointment/chat/<%= appt.id %>" target="_blank">Chat</a>
+                                                <a href="/video/room/<%= appt.id %>" target="_blank">Video Call</a>
+                                            </div>
+                                        <% } else { %>
+                                            <span style="color: #cbd5e0;">—</span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                <% } %>
+            </div>
+        </section>
+    </div>
+    <%- include('partials/chatbot') %>
+</body>
+</html>

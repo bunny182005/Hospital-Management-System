@@ -1,88 +1,22 @@
-# ==================================================
-# Node.js
-# ==================================================
+# Dependency and environment folders
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-package-lock.json
-
-# ==================================================
-# Python Virtual Environment
-# ==================================================
 .venv/
 venv/
+
+# Python cache
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-*.pycache
 
-# ==================================================
-# Environment & Credentials
-# ==================================================
-.env
-.env.*
-*.pem
-*.key
-*.crt
-
-# ==================================================
-# OS Generated Files (macOS, Windows, Linux)
-# ==================================================
+# Local environment & OS files
 .DS_Store
-Thumbs.db
-ehthumbs.db
-Desktop.ini
 
-# ==================================================
-# Logs & Temp Files
-# ==================================================
+# Logs
 *.log
-logs/
-tmp/
-temp/
-.cache/
-.cache-loader/
 
-# ==================================================
-# Editor / IDE Files
-# ==================================================
-.vscode/
-.idea/
-*.swp
-*.swo
-*.sublime-project
-*.sublime-workspace
+# Large model files
+chatbot/chatbot_model/model.safetensors
+*.safetensors
 
-# ==================================================
-# Build / Dist Folders (in case of frontend bundling)
-# ==================================================
+# Build outputs (if any)
 dist/
 build/
-public/assets/plugins/summernote/dist/
-public/assets/plugins/light-gallery/dist/
-
-# ==================================================
-# Database / Backups (if not necessary for versioning)
-# ==================================================
-*.sqlite3
-*.db
-*.sql
-
-# ==================================================
-# Screenshots or local images
-# ==================================================
-screenshot/
-*.png
-*.jpg
-*.jpeg
-*.gif
-
-# ==================================================
-# Miscellaneous
-# ==================================================
-coverage/
-*.pid
-*.seed
-*.pid.lock
